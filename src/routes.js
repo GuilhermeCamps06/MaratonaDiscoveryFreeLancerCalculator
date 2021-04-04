@@ -9,7 +9,8 @@ const profile = {
     "monthly-budget": 3000,
     "days-per-week":5,
     "hours-per-day":5,
-    "vacation-per-year":4
+    "vacation-per-year":4,
+    "value-hour": 75
 }
 const jobs = [
 {
@@ -17,18 +18,54 @@ const jobs = [
         name: "Pizzaria Guloso",
         "daily-hours": 2,
         "total-hours": 60,     
-        created_at: Date.now()   //atribuindo uma nova data
+        created_at: Date.now(),   //atribuindo uma nova data
+ 
 },
 {
         id: 2,
         name: "OneTwo Project",
         "daily-hours": 3,
         "total-hours": 47,     
-         created_at: Date.now()   //atribuindo uma nova data
-}
+         created_at: Date.now(), //atribuindo uma nova data
+            
+},
 ]
 
-    routes.get('/', (req, res) => res.render(views + "index",{profile,jobs}))
+        function remainingDays (job) {
+            const remainingDays = ( job["total-hours"] / job["daily-hours"]).toFixed()
+
+            const createdDate = new Date(job.created_at)
+            const dueDay = createdDate.getDate() + Number(remainingDays)
+            const dueDate = createdDate.setDate(dueDay)
+    
+            const timeDiffInMs = dueDateInMs  = dueDate - Date.now();
+            //transfromar milli em dias
+    
+            const dayInMs = 1000 * 60 * 60 * 24
+            const dayDiff = Math.floor(timeDiffInMs / dayInMs)
+    
+             //Restam x dias i   
+            return dayDiff
+        }
+
+    routes.get('/', (req, res) => {
+
+        const updateJobs = jobs.map((job) => {
+    //ajustes nos jobs
+    //calculo de temp restante
+       const remaining = remainingDays(job)   
+       const status = remaining <= 0? 'done' : 'progress'      
+       return {
+           ...job,
+           remaining,
+           status,
+           budget: profile["value-hour"]*job["total-hours"]
+    } 
+    })
+
+    res.render(views + "index",{profile,jobs: updateJobs})
+})
+
     routes.get('/job', (req, res) => res.render(views + "job"))
     routes.post('/job', (req, res) =>{
 
@@ -42,9 +79,10 @@ const jobs = [
         created_at: Date.now()   //atribuindo uma nova data
     })    
     return res.redirect('/')
-   })
+   });
+
 routes.get('/job/edit', (req, res) => res.render(views + "job-edit"))
 routes.get('/profile', (req, res) => res.render(views + "profile", {profile}))
-
+    
 
 module.exports = routes;
