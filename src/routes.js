@@ -1,7 +1,7 @@
 const express = require('express');
 const routes = express.Router()
+const ProfileController = require('./controllers/ProfileController')
 
-const views = __dirname + "/views/"
 
 const Profile = {
     data:{
@@ -15,34 +15,7 @@ const Profile = {
             "value-hour": 75
         
     },
-    controllers: {
-        index(req, res){
-            return res.render(views + "profile", {profile: Profile.data})
-        },
-
-    update(req, res){
-        // req.body para pegar os dados
-        const data = req.body
-        // definir quantas semanas tem num ano
-        const weeksPerYear = 52
-        // remover as semanas de férias do ano, para pegar quantas semanas tem num mes
-        const weeksPerMonth = (weeksPerYear - data["vacation-per-year"] ) / 12
-        // quantas horas por semana trabalhadas
-        const weekTotalHours = data["hours-per-day"] * data["days-per-week"]
-        // total de horas no mês
-        const monthlyTotalHours = weekTotalHours * weeksPerMonth 
-        // valor da hora
-        const valueHour = data["monthly-budget"] / monthlyTotalHours
-        
-        Profile.data = {
-         ...Profile.data, 
-         ...req.body,
-         "value-hour": valueHour
-           }
-          return res.redirect('/profile') 
-        }    
-    }   
- }
+   }
 
 
 const Job = {
@@ -81,11 +54,11 @@ const Job = {
                            } 
          })
     
-           return res.render(views + "index",{profile: Profile.data, jobs: updatedJobs })
+           return res.render("index",{profile: Profile.data, jobs: updatedJobs })
         },
 
         create(req, res){
-            return res.render(views + "job")
+            return res.render("job")
         },
 
         save(req, res){
@@ -111,7 +84,7 @@ const Job = {
 
             job.budget = Job.services.calculateBudget(job, Profile.data["value-hour"])
 
-          return res.render(views + "job-edit", { job })
+          return res.render("job-edit", { job })
         },
 
         update(req, res){
@@ -145,8 +118,9 @@ const Job = {
 
             return res.redirect('/')           
         }
-  },
-services: {
+   },
+
+    services: {
     remainingDays (job) {
         const remainingDays = ( job["total-hours"] / job["daily-hours"]).toFixed()
 
@@ -164,7 +138,7 @@ services: {
         return dayDiff
     },
     calculateBudget: (job, valueHour) => valueHour * job["total-hours"]
- },
+   },
 }
 
 
@@ -174,7 +148,7 @@ routes.post('/job', Job.controllers.save)
 routes.get('/job/:id', Job.controllers.show)
 routes.post('/job/:id', Job.controllers.update)
 routes.post('/job/delete/:id', Job.controllers.delete)
-routes.get('/profile', Profile.controllers.index)
-routes.post('/profile', Profile.controllers.update)    
+routes.get('/profile', ProfileController.index)
+routes.post('/profile', ProfileController.update)    
 
 module.exports = routes;
