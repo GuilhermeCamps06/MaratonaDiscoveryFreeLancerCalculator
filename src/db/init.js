@@ -42,7 +42,7 @@ INSERT INTO profile (
         5,
         4,
         70
- );`)
+ );`);
 
 await db.run(`
 INSERT INTO jobs(
