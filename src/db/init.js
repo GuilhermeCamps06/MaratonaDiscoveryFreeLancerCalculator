@@ -32,14 +32,16 @@ INSERT INTO profile (
     monthly_budget, 
     days_per_week,
     hours_per_day,
-    vacation_per_year
+    vacation_per_year,
+    value_hour
     ) VALUES(
         "Guilherme",
         "https://avatars.githubusercontent.com/u/39139874?s=400&u=02cc7bf3fcdf420214e090723132653e1b7d7fe3&v=4",
         3000,
         5,
         5,
-        4
+        4,
+        70
  );`)
 
 await db.run(`
